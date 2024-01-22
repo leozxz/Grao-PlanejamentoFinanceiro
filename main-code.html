@@ -1,0 +1,63 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" type="text/javascript"></script>
+
+<script>
+$(function() {
+$('[masked="money"]').mask('000.000.000.000,00', {reverse: true});
+var SPMaskBehavior = function (val) {
+  return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+},
+spOptions = {
+  onKeyPress: function(val, e, field, options) {
+    field.mask(SPMaskBehavior.apply({}, arguments), options);
+  }
+};
+$('[masked="phone"]').mask(SPMaskBehavior, spOptions);
+});
+</script>
+
+
+<script>
+ const PMP = new URLSearchParams(window.location.search).get('pmp');
+
+  if ($("[name='pmp']").length > 0) {
+
+    $("[name='pmp']").val(PMP);
+
+  }
+
+/* Integração com o n8n para a distribuição do lead no mkt cloud, salesforce e banco de dados */
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    /* Recebe todos os campos do form, qualquer coisa temos que mudar esse id do form */
+    var form = document.getElementById('wf-form-FORMS_TESTE_LEO');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        var formData = new FormData(form);
+        var requestOptions = {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
+        };
+
+        /* Aqui é onde envia para o n8n os dados */
+        fetch("https://n8n.timeprimo.com/webhook-test/LeadsPlanejamentoFinanceiro", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+
+                /* Aqui é onde faz o redirect para pagina de obrigado. */
+                window.location.href = "https://www.grao.com.br/?gclid=Cj0KCQiAwbitBhDIARIsABfFYIJSTbiDVpgZudQVxepkrZ93rXcgZdy_1nxxzHJ7gcEIpNiZe-JCY-oaAl1xEALw_wcB"
+                console.log('Formulário enviado com sucesso!');
+                console.log('Resposta do Webhook:', result);
+            })
+
+            /* Onde da erro rs */
+            .catch(error => {
+                console.log('Erro ao enviar o formulário. Por favor, revise os dados.');
+                console.error('Erro:', error);
+            });
+    });
+  });
+</script>
